@@ -23,10 +23,10 @@ export const FormDespacho = ({ venta, onClose }) => {
 
     try {
       // 1. Primero actualizamos el estado de la venta (PUERTO 30081)
-      await axios.put(`http://localhost:30081/api/v1/ventas/${venta.idVenta}`, jsonDataSales);
+      await axios.put(`http://a8b0d04fecb94441e899a862ef5bf851-1265246879.us-east-1.elb.amazonaws.com/api/v1/ventas/${venta.idVenta}`, jsonDataSales);
       
       // 2. Luego creamos el despacho (PUERTO 30082)
-      await axios.post(`http://localhost:30082/api/v1/despachos`, jsonData);
+      await axios.post(`http://a8b0d04fecb94441e899a862ef5bf851-1265246879.us-east-1.elb.amazonaws.com/api/v1/despachos`, jsonData);
       
       Swal.fire({
         title: "Despacho registrado 🛻!",

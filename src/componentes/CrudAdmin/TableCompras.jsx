@@ -9,7 +9,7 @@ export const TableCompras = () => {
  const compras = async () => {
     try {
       // CAMBIA ESTO:
-      const response = await axios.get(`http://a8b0d04fecb94441e899a862ef5bf851-1265246879.us-east-1.elb.amazonaws.com/api/v1/ventas`);
+      const response = await axios.get(`http://172.31.3.62/api/v1/ventas`);
       
       console.log("Datos recibidos:", response.data);
       const datos = Array.isArray(response.data) ? response.data : [response.data];

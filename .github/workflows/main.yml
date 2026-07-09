@@ -1,28 +1,25 @@
 name: Build & Deploy Frontend
 
 on:
-  repository_dispatch:
-    types:
-      - frontend
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: front-despacho
-  EKS_CLUSTER_NAME: nota3-Cluster
+  EKS_CLUSTER_NAME: proyectoeks-cluster
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Configurar credenciales de AWS
+      - name: Configurar credenciales AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -30,28 +27,37 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Login a Amazon ECR
+      - name: Login Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build y push de la imagen Docker a ECR
+      - name: Build y Push Docker
         uses: docker/build-push-action@v6
         with:
-          push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
           context: .
           file: ./Dockerfile
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
           build-args: |
-            VITE_API_BASE_URL=${{ secrets.API_BASE_URL }}
+            VITE_API_VENTAS_URL=${{ secrets.VITE_API_VENTAS_URL }}
+            VITE_API_DESPACHOS_URL=${{ secrets.VITE_API_DESPACHOS_URL }}
 
       - name: Instalar kubectl
         uses: azure/setup-kubectl@v4
         with:
-          version: 'latest'
+          version: latest
 
-      - name: Actualizar kubeconfig para EKS
-        run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+      - name: Configurar kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --region ${{ env.AWS_REGION }} \
+            --name ${{ env.EKS_CLUSTER_NAME }}
 
-      - name: Deploy a EKS
+      - name: Aplicar manifiestos Kubernetes
         run: kubectl apply -f k8s/
 
+      - name: Reiniciar Deployment
+        run: kubectl rollout restart deployment frontend
+
+      - name: Verificar Pods
+        run: kubectl get pods

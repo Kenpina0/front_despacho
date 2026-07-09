@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: 425657202280.dkr.ecr.us-east-1.amazonaws.com/front-despacho:latest
+          image: 232244094566.dkr.ecr.us-east-1.amazonaws.com/front-despacho:latest
           ports:
             - containerPort: 80
           resources:
@@ -49,4 +49,5 @@ spec:
   ports:
     - port: 80
       targetPort: 80
-  type: ClusterIP  
+      nodePort: 30080  
+  type: LoadBalancer  

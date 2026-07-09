@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: back-ventas
-          image: 425657202280.dkr.ecr.us-east-1.amazonaws.com/back-ventas:latest
+          image: 232244094566.dkr.ecr.us-east-1.amazonaws.com/back-ventas:latest
           ports:
             - containerPort: 8080
           envFrom:
@@ -58,4 +58,4 @@ spec:
     - port: 8080
       targetPort: 8080
       nodePort: 30081  
-  type: NodePort    
+  type: NodePort      

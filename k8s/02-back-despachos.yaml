@@ -1,61 +1,53 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: back-despachos
+  name: frontend
   labels:
-    app: back-despachos
+    app: frontend
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: back-despachos
+      app: frontend
   template:
     metadata:
       labels:
-        app: back-despachos
-      annotations:
-        instrumentation.opentelemetry.io/inject-java: "false"
-        instrumentation.opentelemetry.io/inject-nodejs: "false"
-        instrumentation.opentelemetry.io/inject-python: "false"
-        instrumentation.opentelemetry.io/inject-dotnet: "false"
+        app: frontend
     spec:
       containers:
-        - name: back-despachos
-          image: 425657202280.dkr.ecr.us-east-1.amazonaws.com/back-despachos:latest
+        - name: frontend
+          image: 232244094566.dkr.ecr.us-east-1.amazonaws.com/front-despacho:latest
           ports:
-            - containerPort: 8081
-          envFrom:
-            - secretRef:
-                name: db-credentials
+            - containerPort: 80
           resources:
             requests:
-              cpu: "100m"
-              memory: "256Mi"
+              cpu: "50m"
+              memory: "64Mi"
             limits:
-              cpu: "500m"
-              memory: "512Mi"
+              cpu: "200m"
+              memory: "128Mi"
           readinessProbe:
             httpGet:
-              path: /swagger-ui.html
-              port: 8081
-            initialDelaySeconds: 60
+              path: /
+              port: 80
+            initialDelaySeconds: 10
             periodSeconds: 10
           livenessProbe:
             httpGet:
-              path: /swagger-ui.html
-              port: 8081
-            initialDelaySeconds: 90
+              path: /
+              port: 80
+            initialDelaySeconds: 15
             periodSeconds: 15
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: back-despachos-svc
+  name: frontend-svc
 spec:
   selector:
-    app: back-despachos
+    app: frontend
   ports:
-    - port: 8081
-      targetPort: 8081
-      nodePort: 30082  # <--- AGREGADO
-  type: NodePort       # <--- CAMBIADO
+    - port: 80
+      targetPort: 80
+      nodePort: 30080  
+  type: LoadBalancer  
